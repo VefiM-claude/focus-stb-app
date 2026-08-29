@@ -32,7 +32,14 @@ jobs:
           cat build.log
           echo "::endgroup::"
           if [ $code -ne 0 ]; then
-            ESCAPED=$(tail -c 6000 build.log | sed -e 's/%/%25/g' -e 's/\r/%0D/g' | awk '{printf "%s%%0A", $0}')
+            grep -n "^e: " build.log > errors.txt
+            if [ -s errors.txt ]; then
+              SRC=errors.txt
+            else
+              tail -c 6000 build.log > errors.txt
+              SRC=errors.txt
+            fi
+            ESCAPED=$(cat "$SRC" | sed -e 's/%/%25/g' -e 's/\r/%0D/g' | awk '{printf "%s%%0A", $0}')
             echo "::error::${ESCAPED}"
           fi
           exit $code
