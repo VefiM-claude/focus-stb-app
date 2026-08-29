@@ -1,0 +1,7 @@
+<resources>
+    <style name="Theme.FokusStB" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">#F5EAD8</item>
+        <item name="android:windowBackground">#F5EAD8</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+</resources>
