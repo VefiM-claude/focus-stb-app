@@ -5,6 +5,9 @@ on:
     branches: [ main ]
   workflow_dispatch: {}
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -44,9 +47,20 @@ jobs:
           fi
           exit $code
 
-      - name: Upload APK
+      - name: Upload APK as build artifact
         if: success()
         uses: actions/upload-artifact@v4
         with:
           name: fokus-stb-debug-apk
           path: app/build/outputs/apk/debug/app-debug.apk
+
+      - name: Publish APK as a GitHub Release asset
+        if: success()
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: apk-run-${{ github.run_number }}
+          name: Fokus StB debug APK (run ${{ github.run_number }})
+          files: app/build/outputs/apk/debug/app-debug.apk
+          prerelease: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
