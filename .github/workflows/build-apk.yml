@@ -24,9 +24,21 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build debug APK
-        run: ./gradlew assembleDebug --stacktrace
+        run: |
+          set +e
+          ./gradlew assembleDebug --stacktrace > build.log 2>&1
+          code=$?
+          echo "::group::Full gradle output"
+          cat build.log
+          echo "::endgroup::"
+          if [ $code -ne 0 ]; then
+            ESCAPED=$(tail -c 6000 build.log | sed -e 's/%/%25/g' -e 's/\r/%0D/g' | awk '{printf "%s%%0A", $0}')
+            echo "::error::${ESCAPED}"
+          fi
+          exit $code
 
       - name: Upload APK
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: fokus-stb-debug-apk
